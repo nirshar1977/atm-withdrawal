@@ -13,7 +13,6 @@
             <column name="username" type="varchar(255)">
                 <constraints unique="true" nullable="false"/>
             </column>
-            <!-- Add other user columns -->
         </createTable>
 
         <!-- Create Bank Account Table -->
@@ -24,7 +23,22 @@
             <column name="user_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <!-- Add other bank_account columns -->
+            <column name="balance" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create Card Table -->
+        <createTable tableName="card">
+            <column name="card_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="card_number" type="varchar(16)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="account_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <!-- Create Transaction Table -->
@@ -35,7 +49,6 @@
             <column name="account_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <!-- Add fields related to withdrawal request -->
             <column name="card_number" type="varchar(16)">
                 <constraints nullable="false"/>
             </column>
@@ -75,6 +88,11 @@
 
         <addForeignKeyConstraint baseTableName="transaction" baseColumnNames="account_id"
                                  constraintName="fk_transaction_account_id"
+                                 referencedTableName="bank_account" referencedColumnNames="account_id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="card" baseColumnNames="bank_account_id"
+                                 constraintName="fk_card_bank_account_id"
                                  referencedTableName="bank_account" referencedColumnNames="account_id"
                                  onDelete="CASCADE"/>
 

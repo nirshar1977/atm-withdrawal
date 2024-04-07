@@ -1,6 +1,7 @@
 package com.bankhapoalim.atmwithdrawal.util;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
+import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -80,13 +81,14 @@ public class ValidationUtils {
 
     private Predicate<WithdrawalRequestDTO> hasValidWithdrawalAmount() {
         return withdrawalRequest -> {
-            if (withdrawalRequest.getAmount() <= 0) {
+            if (withdrawalRequest.getAmount().intValue() <= 0) {
                 log.error("Invalid withdrawal amount: {}", withdrawalRequest.getAmount());
                 return false;
             }
             return true;
         };
     }
+
 
     /**
      * Checks if the given withdrawal request is within the daily withdrawal limit for the customer.
@@ -98,7 +100,7 @@ public class ValidationUtils {
     private synchronized Predicate<WithdrawalRequestDTO> isWithinDailyWithdrawalLimit() {
         return withdrawalRequest -> {
             String cardNumber = withdrawalRequest.getCardNumber();
-            double amount = withdrawalRequest.getAmount();
+            double amount = withdrawalRequest.getAmount().intValue();
 
             LocalDateTime currentTime = LocalDateTime.now();
             LocalDateTime lastWithdrawalTime = lastWithdrawalTimes.getOrDefault(cardNumber, null);

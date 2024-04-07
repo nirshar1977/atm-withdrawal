@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 001
-      author: nir
+      id: "001"
+      author: "nir"
       preConditions:
         onFail: MARK_RAN
         not:
@@ -10,6 +10,8 @@ databaseChangeLog:
           tableExists:
             tableName: bank_account
           tableExists:
+            tableName: card
+          tableExists:
             tableName: transaction
           tableExists:
             tableName: transaction_history
@@ -17,121 +19,154 @@ databaseChangeLog:
             tableName: audit_log
       changes:
         - createTable:
-            tableName: user
+            tableName: "user"
             columns:
               - column:
-                  name: user_id
-                  type: bigint
+                  name: "user_id"
+                  type: "bigint"
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: username
-                  type: varchar(255)
+                  name: "username"
+                  type: "varchar(255)"
                   constraints:
                     unique: true
                     nullable: false
         - createTable:
-            tableName: bank_account
+            tableName: "bank_account"
             columns:
               - column:
-                  name: account_id
-                  type: bigint
+                  name: "account_id"
+                  type: "bigint"
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: user_id
-                  type: bigint
+                  name: "user_id"
+                  type: "bigint"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "balance"
+                  type: "decimal(10,2)"
                   constraints:
                     nullable: false
         - createTable:
-            tableName: transaction
+            tableName: "card"
             columns:
               - column:
-                  name: transaction_id
-                  type: bigint
+                  name: "card_id"
+                  type: "bigint"
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: account_id
-                  type: bigint
+                  name: "card_number"
+                  type: "varchar(16)"
                   constraints:
+                    unique: true
                     nullable: false
               - column:
-                  name: card_number
-                  type: varchar(16)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: secret_code
-                  type: varchar(4)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: amount
-                  type: decimal(10, 2)
+                  name: "account_id"
+                  type: "bigint"
                   constraints:
                     nullable: false
         - createTable:
-            tableName: transaction_history
+            tableName: "transaction"
             columns:
               - column:
-                  name: history_id
-                  type: bigint
+                  name: "transaction_id"
+                  type: "bigint"
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: transaction_id
-                  type: bigint
+                  name: "account_id"
+                  type: "bigint"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "card_number"
+                  type: "varchar(16)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "secret_code"
+                  type: "varchar(4)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "amount"
+                  type: "decimal(10, 2)"
                   constraints:
                     nullable: false
         - createTable:
-            tableName: audit_log
+            tableName: "transaction_history"
             columns:
               - column:
-                  name: log_id
-                  type: bigint
+                  name: "history_id"
+                  type: "bigint"
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: transaction_id
-                  type: bigint
+                  name: "transaction_id"
+                  type: "bigint"
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: "audit_log"
+            columns:
+              - column:
+                  name: "log_id"
+                  type: "bigint"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "transaction_id"
+                  type: "bigint"
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
-            baseTableName: bank_account
-            baseColumnNames: user_id
-            constraintName: fk_bank_account_user_id
-            referencedTableName: user
-            referencedColumnNames: user_id
-            onDelete: CASCADE
+            baseTableName: "bank_account"
+            baseColumnNames: "user_id"
+            constraintName: "fk_bank_account_user_id"
+            referencedTableName: "user"
+            referencedColumnNames: "user_id"
+            onDelete: "CASCADE"
         - addForeignKeyConstraint:
-            baseTableName: transaction
-            baseColumnNames: account_id
-            constraintName: fk_transaction_account_id
-            referencedTableName: bank_account
-            referencedColumnNames: account_id
-            onDelete: CASCADE
+            baseTableName: "transaction"
+            baseColumnNames: "account_id"
+            constraintName: "fk_transaction_account_id"
+            referencedTableName: "bank_account"
+            referencedColumnNames: "account_id"
+            onDelete: "CASCADE"
         - addForeignKeyConstraint:
-            baseTableName: transaction_history
-            baseColumnNames: transaction_id
-            constraintName: fk_transaction_history_transaction_id
-            referencedTableName: transaction
-            referencedColumnNames: transaction_id
-            onDelete: CASCADE
+            baseTableName: "card"
+            baseColumnNames: "account_id"
+            constraintName: "fk_card_bank_account_id"
+            referencedTableName: "bank_account"
+            referencedColumnNames: "account_id"
+            onDelete: "CASCADE"
         - addForeignKeyConstraint:
-            baseTableName: audit_log
-            baseColumnNames: transaction_id
-            constraintName: fk_audit_log_transaction_id
-            referencedTableName: transaction
-            referencedColumnNames: transaction_id
-            onDelete: CASCADE
+            baseTableName: "transaction_history"
+            baseColumnNames: "transaction_id"
+            constraintName: "fk_transaction_history_transaction_id"
+            referencedTableName: "transaction"
+            referencedColumnNames: "transaction_id"
+            onDelete: "CASCADE"
+        - addForeignKeyConstraint:
+            baseTableName: "audit_log"
+            baseColumnNames: "transaction_id"
+            constraintName: "fk_audit_log_transaction_id"
+            referencedTableName: "transaction"
+            referencedColumnNames: "transaction_id"
+            onDelete: "CASCADE"

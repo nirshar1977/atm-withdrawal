@@ -2,6 +2,8 @@ package com.bankhapoalim.atmwithdrawal.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -13,13 +15,20 @@ public class BankAccount {
     @Column(name = "account_id")
     private long accountId;
 
+    @Column(name = "balance", precision = 10, scale = 2, nullable = false)
+    private BigDecimal balance;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    //Each BankAccount can have multiple transactions connected to it
+    //Each BankAccount can have multiple transactions related to it
     @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL)
     private List<WithdrawalRequest> transactions;
+
+    //Each BankAccount can have multiple cards connected to it
+    @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL)
+    private List<Card> cards;
 }
 
 

@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 @Data
 @Entity
 @Table(name = "transaction")
+/**
+ * Represents a transaction related to a bank account
+ */
 public class WithdrawalRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,8 +20,8 @@ public class WithdrawalRequest {
     private long transactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_account_id", nullable = false)
-    private BankAccount bankAccount;
+    @JoinColumn(name = "account_id", nullable = false)
+    private BankAccount  bankAccount;
 
     @Column(name = "card_number", length = 16, nullable = false)
     private String cardNumber;

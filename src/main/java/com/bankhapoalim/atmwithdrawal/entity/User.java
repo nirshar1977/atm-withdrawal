@@ -6,6 +6,9 @@ import lombok.Data;
 @Entity
 @Table(name = "user")
 @Data
+/**
+ * Represents a user in the system
+ */
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
