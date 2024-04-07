@@ -101,7 +101,7 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>4.7.1</version> <!-- Replace with the latest version -->
+            <version>4.27.0</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -161,7 +161,7 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>4.3.2</version>
                 <configuration>
-                    <changeLogFile>src/main/resources/db/changelog-master.xml</changeLogFile>
+                    <changeLogFile>src/main/resources/db/changelog/changelog-master.xml</changeLogFile>
                     <driver>org.postgresql.Driver</driver>
                     <url>jdbc:postgresql://localhost:5432/atm-db</url>
                     <defaultSchemaName>public</defaultSchemaName>

@@ -13,5 +13,4 @@ public class AtmWithdrawalApplication {
     public static void main(String[] args) {
         SpringApplication.run(AtmWithdrawalApplication.class, args);
     }
-
 }
