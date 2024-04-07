@@ -155,6 +155,23 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- Liquibase plugin configuration -->
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>4.3.2</version>
+                <configuration>
+                    <changeLogFile>src/main/resources/db/changelog-master.xml</changeLogFile>
+                    <driver>org.postgresql.Driver</driver>
+                    <url>jdbc:postgresql://localhost:5432/atm-db</url>
+                    <defaultSchemaName>public</defaultSchemaName>
+                    <username>postgres</username>
+                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                    <expressionVariables>
+                        <db.schema>public</db.schema>
+                    </expressionVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -1,0 +1,92 @@
+<!-- changelog-master.xml -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001" author="nir">
+        <!-- Create User Table -->
+        <createTable tableName="user">
+            <column name="user_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <!-- Add other user columns -->
+        </createTable>
+
+        <!-- Create Bank Account Table -->
+        <createTable tableName="bank_account">
+            <column name="account_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Add other bank_account columns -->
+        </createTable>
+
+        <!-- Create Transaction Table -->
+        <createTable tableName="transaction">
+            <column name="transaction_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Add fields related to withdrawal request -->
+            <column name="card_number" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_code" type="varchar(4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create Transaction History Table -->
+        <createTable tableName="transaction_history">
+            <column name="history_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transaction_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create Audit Log Table -->
+        <createTable tableName="audit_log">
+            <column name="log_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transaction_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add Foreign Keys -->
+        <addForeignKeyConstraint baseTableName="bank_account" baseColumnNames="user_id"
+                                 constraintName="fk_bank_account_user_id"
+                                 referencedTableName="user" referencedColumnNames="user_id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="transaction" baseColumnNames="account_id"
+                                 constraintName="fk_transaction_account_id"
+                                 referencedTableName="bank_account" referencedColumnNames="account_id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="transaction_history" baseColumnNames="transaction_id"
+                                 constraintName="fk_transaction_history_transaction_id"
+                                 referencedTableName="transaction" referencedColumnNames="transaction_id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="audit_log" baseColumnNames="transaction_id"
+                                 constraintName="fk_audit_log_transaction_id"
+                                 referencedTableName="transaction" referencedColumnNames="transaction_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
