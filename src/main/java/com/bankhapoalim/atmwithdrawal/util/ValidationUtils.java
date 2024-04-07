@@ -97,7 +97,7 @@ public class ValidationUtils {
      *
      * @return true if the withdrawal request is within the daily withdrawal limit, false otherwise.
      */
-    private synchronized Predicate<WithdrawalRequestDTO> isWithinDailyWithdrawalLimit() {
+    public synchronized Predicate<WithdrawalRequestDTO> isWithinDailyWithdrawalLimit() {
         return withdrawalRequest -> {
             String cardNumber = withdrawalRequest.getCardNumber();
             double amount = withdrawalRequest.getAmount().intValue();
@@ -131,7 +131,7 @@ public class ValidationUtils {
      *
      * @return Predicate representing the validation logic for duplicate withdrawal requests.
      */
-    private synchronized Predicate<WithdrawalRequestDTO> isNotDuplicateWithdrawalRequest() {
+    public synchronized Predicate<WithdrawalRequestDTO> isNotDuplicateWithdrawalRequest() {
         return withdrawalRequest -> {
             String cardNumber = withdrawalRequest.getCardNumber();
             LocalDateTime currentTime = LocalDateTime.now();

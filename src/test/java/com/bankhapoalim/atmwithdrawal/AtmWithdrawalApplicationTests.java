@@ -9,5 +9,4 @@ class AtmWithdrawalApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
