@@ -1,0 +1,99 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+
+    <changeSet id="1" author="nir">
+        <createTable tableName="withdrawal_request">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="card_number" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_code" type="varchar(4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="nir">
+        <createTable tableName="user">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Other user-related columns -->
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="nir">
+        <createTable tableName="transaction_history">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transaction_id" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Other transaction history columns -->
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="nir">
+        <createTable tableName="account_balance">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="decimal(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Other account balance columns -->
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="nir">
+        <createTable tableName="audit_log">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="action_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Other audit log columns -->
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="nir">
+        <createTable tableName="security_token">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Other security token columns -->
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>
