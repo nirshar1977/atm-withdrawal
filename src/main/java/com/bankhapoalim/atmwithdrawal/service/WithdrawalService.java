@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @Slf4j
 public class WithdrawalService {
@@ -27,7 +29,7 @@ public class WithdrawalService {
         WithdrawalRequest withdrawalRequest = new WithdrawalRequest();
         withdrawalRequest.setCardNumber(withdrawalRequestDTO.getCardNumber());
         withdrawalRequest.setSecretCode(withdrawalRequestDTO.getSecretCode());
-        withdrawalRequest.setAmount(withdrawalRequestDTO.getAmount());
+        withdrawalRequest.setAmount(BigDecimal.valueOf(withdrawalRequestDTO.getAmount()));
 
         withdrawalRequestRepository.save(withdrawalRequest);
         log.info("Withdrawal request processed successfully: {}", withdrawalRequestDTO);

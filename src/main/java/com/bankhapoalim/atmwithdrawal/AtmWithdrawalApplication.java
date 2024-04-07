@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication
 @Profile("dev")
-@EntityScan(basePackages = "com.bankhapoalim.atmwithdrawal.entity")
+@EntityScan("com.bankhapoalim.atmwithdrawal.entity")
 public class AtmWithdrawalApplication {
 
     public static void main(String[] args) {
