@@ -26,6 +26,12 @@ public class WithdrawalService {
     @Autowired
     private BankAccountService bankAccountService;
 
+    /**
+     * Process a withdrawal request based on the provided data.
+     *
+     * @param withdrawalRequestDTO The withdrawal request details including card number, secret code, and amount.
+     * @return true if the withdrawal request is processed successfully, false otherwise.
+     */
     public boolean processWithdrawalRequest(WithdrawalRequestDTO withdrawalRequestDTO) {
         if (!validationUtils.isValidWithdrawalRequest().test(withdrawalRequestDTO)) {
             log.error("Invalid withdrawal request: {}", withdrawalRequestDTO);
