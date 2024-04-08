@@ -29,7 +29,7 @@ public class WithdrawalService {
     private BankAccountRepository accountRepository;
 
     @Autowired
-    private BankAccountService bankAccountService;
+    private BankAccountServiceImpl bankAccountService;
 
     /**
      * Process a withdrawal request based on the provided data.
@@ -74,23 +74,27 @@ public class WithdrawalService {
      *      Update Account Balance: If the withdrawal amount has already been deducted from the account balance, you may need to update the account balance to reverse the deduction.
      *      Validation Checks: Perform additional checks before allowing cancellation, such as checking if the withdrawal request is still in a cancellable state, verifying the user's authorization to cancel, etc.
      *
-     * @param transactionId The ID of the withdrawal request to cancel.
+     * @param withdrawalRequestId The ID of the withdrawal request to cancel.
      * @return true if the cancellation is successful, false otherwise.
      */
-    public boolean cancelWithdrawalRequest(Long transactionId) {
-        Optional<WithdrawalRequest> optionalTransaction = withdrawalRequestRepository.findById(transactionId);
-        if (optionalTransaction.isPresent()) {
-            WithdrawalRequest transaction = optionalTransaction.get();
-            if (transaction.getStatus() == WithdrawalStatus.PENDING) {
-                //TODO: Add additional steps detailed in function documentation
-                transaction.setStatus(WithdrawalStatus.CANCELED);
-                withdrawalRequestRepository.save(transaction);
-                // Return true to indicate successful cancellation
-                return true;
+    public boolean cancelWithdrawalRequest(Long withdrawalRequestId) {
+        Optional<WithdrawalRequest> withdrawalRequestOptional = withdrawalRequestRepository.findById(withdrawalRequestId);
+        if (withdrawalRequestOptional.isPresent()) {
+            WithdrawalRequest withdrawalRequest = withdrawalRequestOptional.get();
+            if (WithdrawalStatus.COMPLETED.equals(withdrawalRequest.getStatus())) {
+                BigDecimal amountToReverse = withdrawalRequest.getAmount();
+                bankAccountService.reverseBalance(withdrawalRequest.getBankAccount().getAccountId(), amountToReverse, "Withdrawal cancellation");
+                withdrawalRequest.setStatus(WithdrawalStatus.CANCELED);
+                withdrawalRequestRepository.save(withdrawalRequest);
+            } else {
+                // Handle cancellation for other statuses (e.g., 'pending', 'canceled')
+                // For example, throw an exception or log a message
             }
+        } else {
+            // Withdrawal request not found
+            // Handle accordingly (e.g., throw an exception, log an error)
         }
-        // Return false if cancellation is not possible
-        return false;
+        return true;
     }
 
     /**
