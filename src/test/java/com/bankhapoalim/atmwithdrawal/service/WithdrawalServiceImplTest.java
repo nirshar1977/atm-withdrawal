@@ -65,4 +65,25 @@ class WithdrawalServiceImplTest {
         // Assert the result
         assert(result);
     }
+
+    @Test
+    void testProcessWithdrawalRequest_InvalidRequest() {
+        // Mocking the validation check to return false (indicating an invalid withdrawal request)
+        when(validationUtils.isValidWithdrawalRequest()).thenReturn(withdrawalRequestDTO -> false);
+
+        WithdrawalRequestDTO withdrawalRequestDTO = new WithdrawalRequestDTO();
+        withdrawalRequestDTO.setCardNumber("1234567890123456");
+        withdrawalRequestDTO.setSecretCode("1234");
+        withdrawalRequestDTO.setAmount(BigDecimal.valueOf(100.0));
+
+        // Perform the method call
+        boolean result = withdrawalService.processWithdrawalRequest(withdrawalRequestDTO);
+
+        // Verify that the save method was not called (since the request is invalid)
+        verify(withdrawalRequestRepository, never()).save(any());
+        verify(accountRepository, never()).save(any());
+
+        // Assert that the method returned false
+        assert(!result);
+    }
 }
