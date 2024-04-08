@@ -4,21 +4,18 @@ import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
-import com.bankhapoalim.atmwithdrawal.service.BankAccountServiceImpl;
 import com.bankhapoalim.atmwithdrawal.util.ValidationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
 class WithdrawalServiceImplTest {
 
     @Mock
