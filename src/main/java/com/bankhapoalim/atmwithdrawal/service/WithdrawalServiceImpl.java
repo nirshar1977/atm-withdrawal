@@ -5,6 +5,8 @@ import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.exception.AccountNotFoundException;
+import com.bankhapoalim.atmwithdrawal.exception.WithdrawalProcessingException;
 import com.bankhapoalim.atmwithdrawal.exception.WithdrawalRequestNotFoundException;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
@@ -53,11 +55,17 @@ public class WithdrawalServiceImpl implements WithdrawalService{
                 .setSecretCode(withdrawalRequestDTO.getSecretCode())
                 .setAmount(withdrawalRequestDTO.getAmount())
                 .setBankAccount(bankAccount)
+                .setWithdrawalStatus(WithdrawalStatus.IN_PROGRESS)
                 .build();
 
-        withdrawalRequestRepository.save(withdrawalRequest);
-
-        log.info("Withdrawal request processed successfully: {}", withdrawalRequest);
+        try {
+            withdrawalRequestRepository.save(withdrawalRequest);
+            withdrawalRequest.setStatus(WithdrawalStatus.COMPLETED);
+            log.info("Withdrawal request processed successfully: {}", withdrawalRequest);
+        } catch (Exception e) {
+            log.error("Failed to process withdrawal request: {}", e.getMessage());
+            throw new WithdrawalProcessingException("Error processing withdrawal request", e);
+        }
 
         return true;
     }
@@ -78,7 +86,7 @@ public class WithdrawalServiceImpl implements WithdrawalService{
         // Calculate new balance
         BankAccount bankAccount = bankAccountService.getAccountFromCache(card);
         if (bankAccount == null) {
-            throw new IllegalArgumentException("Bank Account not found"); //TODO: Add more info to exception message
+            throw new AccountNotFoundException("Bank Account not found for card: " + card.getCardNumber());
         }
 
         BigDecimal withdrawalAmount = withdrawalRequestDTO.getAmount();
@@ -135,10 +143,10 @@ public class WithdrawalServiceImpl implements WithdrawalService{
                     withdrawalRequestRepository.save(withdrawalRequest);
                     res = true;
                 }
-                case PENDING -> {
+                case IN_PROGRESS -> {
                     // Option 1: Immediate Cancellation
                      log.warn("Cannot cancel a pending withdrawal immediately.");
-                     throw new IllegalStateException("Pending withdrawals cannot be canceled immediately.");
+                     throw new IllegalStateException("In Progress withdrawals cannot be canceled immediately.");
 
                     // Option 2: Delayed Cancellation
                     // Mark the withdrawal request as canceled but only reverse the balance deduction if the status changes to 'completed' later.

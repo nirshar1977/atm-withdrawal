@@ -2,6 +2,8 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
+import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
+import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
 import com.bankhapoalim.atmwithdrawal.util.ValidationUtils;
@@ -12,8 +14,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -117,5 +120,46 @@ class WithdrawalServiceImplTest {
 
         // Verify that the account balance was not updated (since the balance is insufficient)
         verify(accountRepository, never()).save(any());
+    }
+
+    @Test
+    void testCancelWithdrawalRequest_Completed() {
+        // Mock a completed withdrawal request
+        WithdrawalRequest withdrawalRequest = new WithdrawalRequest();
+        withdrawalRequest.setStatus(WithdrawalStatus.COMPLETED);
+        BigDecimal withdrawalAmount = BigDecimal.valueOf(50.0);
+        withdrawalRequest.setAmount(withdrawalAmount);
+
+        // Mock a bank account associated with the withdrawal request
+        BankAccount bankAccount = new BankAccount();
+        BigDecimal initialBalance = BigDecimal.valueOf(1000.0); // Assuming initial balance is $1000
+        bankAccount.setBalance(initialBalance);
+        long accountId = 123L; // Example account ID
+        bankAccount.setAccountId(accountId);
+        withdrawalRequest.setBankAccount(bankAccount);
+
+        // Mock the findById methods of withdrawalRequestRepository and bankAccountRepository
+        when(withdrawalRequestRepository.findById(anyLong())).thenReturn(Optional.of(withdrawalRequest));
+
+        // Mock the reverseBalance method of bankAccountService
+        doNothing().when(bankAccountService).reverseBalance(eq(accountId), any(BigDecimal.class), eq("Withdrawal cancellation"));
+
+        // Perform the cancellation
+        boolean cancellationResult = withdrawalService.cancelWithdrawalRequest(123L);
+
+        // Verify that the cancellation is successful
+        assertTrue(cancellationResult); // Assuming your cancelWithdrawalRequest method returns a boolean indicating success
+
+        // Verify that the withdrawal status is updated to CANCELED
+        assertEquals(WithdrawalStatus.CANCELED, withdrawalRequest.getStatus());
+
+        // Verify that the amount is added back to the account balance
+        BigDecimal expectedBalance = initialBalance.add(withdrawalAmount);
+        assertEquals(expectedBalance, bankAccount.getBalance());
+
+        // Verify interactions with the repositories/services
+        verify(withdrawalRequestRepository, times(1)).findById(123L);
+        verify(withdrawalRequestRepository, times(1)).save(withdrawalRequest);
+        verify(accountRepository, times(1)).findById(accountId);
     }
 }

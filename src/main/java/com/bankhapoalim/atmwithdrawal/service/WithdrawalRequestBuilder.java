@@ -2,6 +2,7 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
+import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
 
 import java.math.BigDecimal;
 
@@ -10,6 +11,7 @@ public class WithdrawalRequestBuilder {
     private String secretCode;
     private BigDecimal amount;
     private BankAccount account;
+    private WithdrawalStatus status;
 
     public WithdrawalRequestBuilder setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
@@ -28,6 +30,11 @@ public class WithdrawalRequestBuilder {
 
     public WithdrawalRequestBuilder setBankAccount(BankAccount bankAccount) {
         this.account = bankAccount;
+        return this;
+    }
+
+    public WithdrawalRequestBuilder setWithdrawalStatus(WithdrawalStatus withdrawalStatus) {
+        this.status = withdrawalStatus;
         return this;
     }
 
