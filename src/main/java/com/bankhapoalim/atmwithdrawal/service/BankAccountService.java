@@ -38,13 +38,13 @@ public class BankAccountService {
     @Cacheable(value = "bankAccountCache", key = "#card.cardNumber")
     public BankAccount getAccountFromCache(Card card) {
         String cardNumber = card.getCardNumber();
-        log.info("Checking cache for bank account with card number: {}", card.getCardId());
+        log.info("Checking cache for bank account with card number: {}", cardNumber);
         Optional<BankAccount> cachedAccount = Optional.ofNullable(redisTemplate.opsForValue().get(cardNumber));
         if (cachedAccount.isPresent()) {
-            log.debug("Retrieved bank account from cache for card number: {}", card.getCardId());
+            log.debug("Retrieved bank account from cache for card number: {}", cardNumber);
             return cachedAccount.get();
         } else {
-            log.info("Bank account not found in cache for card number: {}. Fetching from database.", card.getCardId());
+            log.info("Bank account not found in cache for card number: {}. Fetching from database.",cardNumber);
             BankAccount account = bankAccountRepository.findByCards(card);
             if (account != null) {
                 log.info("Fetched bank account from database for card number: {}", cardNumber);

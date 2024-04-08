@@ -5,12 +5,14 @@ import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
 import com.bankhapoalim.atmwithdrawal.util.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,9 @@ public class WithdrawalService {
 
     @Autowired
     private WithdrawalRequestRepository withdrawalRequestRepository;
+
+    @Autowired
+    private BankAccountRepository accountRepository;
 
     @Autowired
     private BankAccountService bankAccountService;
@@ -42,10 +47,23 @@ public class WithdrawalService {
         withdrawalRequest.setCardNumber(withdrawalRequestDTO.getCardNumber());
         withdrawalRequest.setSecretCode(withdrawalRequestDTO.getSecretCode());
         withdrawalRequest.setAmount(withdrawalRequestDTO.getAmount());
-        withdrawalRequest.setBankAccount(getBankAccount(withdrawalRequestDTO.getCardNumber()));
 
+        // Calculate new balance
+        BankAccount bankAccount = getBankAccount(withdrawalRequestDTO.getCardNumber());
+        if(bankAccount==null){
+            throw new IllegalArgumentException("Bank Account not found"); //TODO: Add more info to exception message
+        }
+        BigDecimal updatedBalance = bankAccount.getBalance().subtract(withdrawalRequest.getAmount());
+
+        // Update account balance
+        bankAccount.setBalance(updatedBalance);
+        accountRepository.save(bankAccount);
+
+        withdrawalRequest.setBankAccount(bankAccount);
         withdrawalRequestRepository.save(withdrawalRequest);
+
         log.info("Withdrawal request processed successfully: {}", withdrawalRequestDTO);
+
         return true;
     }
 
@@ -75,6 +93,11 @@ public class WithdrawalService {
         return false;
     }
 
+    /**
+     * Get Bank Account by Card info
+     * @param cardNumber
+     * @return BankAccount instance
+     */
     private BankAccount getBankAccount(String cardNumber) {
         // Initialize a Card object with the card number
         Card card = new Card();

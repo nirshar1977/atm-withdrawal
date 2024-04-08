@@ -107,6 +107,8 @@ public class ValidationUtils {
             double dailyWithdrawalAmount = dailyWithdrawalAmounts.getOrDefault(cardNumber, 0.0);
             AtomicInteger dailyWithdrawalCount = dailyWithdrawalCounts.computeIfAbsent(cardNumber, k -> new AtomicInteger());
 
+            //If this condition is true, it indicates that the withdrawal request is happening on a new day,
+            // and the daily withdrawal limits need to be reset for the customer.
             if (lastWithdrawalTime == null || lastWithdrawalTime.toLocalDate().isBefore(currentTime.toLocalDate())) {
                 dailyWithdrawalAmounts.put(cardNumber, amount);
                 dailyWithdrawalCount.set(1);
