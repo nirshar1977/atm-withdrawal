@@ -5,6 +5,7 @@ import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.exception.WithdrawalRequestNotFoundException;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
 import com.bankhapoalim.atmwithdrawal.util.ValidationUtils;
@@ -80,24 +81,40 @@ public class WithdrawalServiceImpl implements WithdrawalService{
      */
     @Override
     public boolean cancelWithdrawalRequest(Long withdrawalRequestId) {
+        boolean res = false;
         Optional<WithdrawalRequest> withdrawalRequestOptional = withdrawalRequestRepository.findById(withdrawalRequestId);
         if (withdrawalRequestOptional.isPresent()) {
             WithdrawalRequest withdrawalRequest = withdrawalRequestOptional.get();
-            if (WithdrawalStatus.COMPLETED.equals(withdrawalRequest.getStatus())) {
-                BigDecimal amountToReverse = withdrawalRequest.getAmount();
-                bankAccountService.reverseBalance(withdrawalRequest.getBankAccount().getAccountId(), amountToReverse, "Withdrawal cancellation");
-                withdrawalRequest.setStatus(WithdrawalStatus.CANCELED);
-                withdrawalRequestRepository.save(withdrawalRequest);
-            } else {
-                // TODO: Handle cancellation for other statuses (e.g., 'pending', 'canceled')
-                // For example, throw an exception or log a message
+            switch(withdrawalRequest.getStatus()){
+                case COMPLETED -> {
+                    BigDecimal amountToReverse = withdrawalRequest.getAmount();
+                    bankAccountService.reverseBalance(withdrawalRequest.getBankAccount().getAccountId(), amountToReverse, "Withdrawal cancellation");
+                    withdrawalRequest.setStatus(WithdrawalStatus.CANCELED);
+                    withdrawalRequestRepository.save(withdrawalRequest);
+                    res = true;
+                }
+                case PENDING -> {
+                    // Option 1: Immediate Cancellation
+                     log.warn("Cannot cancel a pending withdrawal immediately.");
+                     throw new IllegalStateException("Pending withdrawals cannot be canceled immediately.");
+
+                    // Option 2: Delayed Cancellation
+                    // Mark the withdrawal request as canceled but only reverse the balance deduction if the status changes to 'completed' later.
+                    // withdrawalRequest.setStatus(WithdrawalStatus.CANCELED);
+                    //withdrawalRequestRepository.save(withdrawalRequest);
+                    //res = true; // Marked as canceled
+                }
+                case CANCELED -> {
+                    log.warn("Withdrawal request is already canceled.");
+                }
             }
         } else {
-            // Withdrawal request not found
-            // TODO: Handle accordingly (e.g., throw an exception, log an error)
+            log.error("Withdrawal request with ID {} not found.", withdrawalRequestId);
+            throw new WithdrawalRequestNotFoundException("Withdrawal request not found.");
         }
-        return true;
+        return res;
     }
+
 
     /**
      * Get Bank Account by Card info
