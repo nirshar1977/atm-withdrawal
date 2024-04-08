@@ -45,28 +45,40 @@ public class WithdrawalServiceImpl implements WithdrawalService{
             return false;
         }
 
-        WithdrawalRequest withdrawalRequest = new WithdrawalRequest();
-        withdrawalRequest.setCardNumber(withdrawalRequestDTO.getCardNumber());
-        withdrawalRequest.setSecretCode(withdrawalRequestDTO.getSecretCode());
-        withdrawalRequest.setAmount(withdrawalRequestDTO.getAmount());
+        BankAccount bankAccount = updateAccountBalance(withdrawalRequestDTO);
 
+
+        WithdrawalRequest withdrawalRequest = new WithdrawalRequestBuilder()
+                .setCardNumber(withdrawalRequestDTO.getCardNumber())
+                .setSecretCode(withdrawalRequestDTO.getSecretCode())
+                .setAmount(withdrawalRequestDTO.getAmount())
+                .setBankAccount(bankAccount)
+                .build();
+
+        withdrawalRequestRepository.save(withdrawalRequest);
+
+        log.info("Withdrawal request processed successfully: {}", withdrawalRequest);
+
+        return true;
+    }
+
+    /**
+     * Update user account balance based on the withdrawal request
+     * @param withdrawalRequestDTO
+     * @return
+     */
+    private BankAccount updateAccountBalance(WithdrawalRequestDTO withdrawalRequestDTO) {
         // Calculate new balance
         BankAccount bankAccount = getBankAccount(withdrawalRequestDTO.getCardNumber());
         if(bankAccount==null){
             throw new IllegalArgumentException("Bank Account not found"); //TODO: Add more info to exception message
         }
-        BigDecimal updatedBalance = bankAccount.getBalance().subtract(withdrawalRequest.getAmount());
+        BigDecimal updatedBalance = bankAccount.getBalance().subtract(withdrawalRequestDTO.getAmount());
 
         // Update account balance
         bankAccount.setBalance(updatedBalance);
         accountRepository.save(bankAccount);
-
-        withdrawalRequest.setBankAccount(bankAccount);
-        withdrawalRequestRepository.save(withdrawalRequest);
-
-        log.info("Withdrawal request processed successfully: {}", withdrawalRequestDTO);
-
-        return true;
+        return bankAccount;
     }
 
     /**
