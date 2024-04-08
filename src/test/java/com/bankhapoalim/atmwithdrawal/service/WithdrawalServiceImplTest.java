@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -85,5 +86,36 @@ class WithdrawalServiceImplTest {
 
         // Assert that the method returned false
         assert(!result);
+    }
+
+    @Test
+    void testProcessWithdrawalRequest_InsufficientBalance() {
+        // Mock validation to return true (indicating a valid withdrawal request)
+        when(validationUtils.isValidWithdrawalRequest()).thenReturn(withdrawalRequestDTO -> true);
+
+        WithdrawalRequestDTO withdrawalRequestDTO = new WithdrawalRequestDTO();
+        withdrawalRequestDTO.setCardNumber("1234567890123456");
+        withdrawalRequestDTO.setSecretCode("1234");
+
+        // Set an amount that exceeds the current balance
+        BigDecimal currentBalance = BigDecimal.valueOf(50.0);
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setBalance(currentBalance);
+
+        // Mock the bankAccountService to return the mockBankAccount
+        when(bankAccountService.getAccountFromCache(any())).thenReturn(bankAccount);
+        when(accountRepository.save(any(BankAccount.class))).thenReturn(bankAccount);
+        when(accountRepository.findById(anyLong())).thenReturn(java.util.Optional.of(bankAccount));
+
+
+        // Set an amount greater than the current balance
+        BigDecimal withdrawalAmount = BigDecimal.valueOf(100.0);
+        withdrawalRequestDTO.setAmount(withdrawalAmount);
+
+        // Perform the method call
+        assertThrows(IllegalArgumentException.class, () -> withdrawalService.processWithdrawalRequest(withdrawalRequestDTO));
+
+        // Verify that the account balance was not updated (since the balance is insufficient)
+        verify(accountRepository, never()).save(any());
     }
 }

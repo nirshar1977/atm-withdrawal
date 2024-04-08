@@ -63,23 +63,53 @@ public class WithdrawalServiceImpl implements WithdrawalService{
     }
 
     /**
-     * Update user account balance based on the withdrawal request
-     * @param withdrawalRequestDTO
-     * @return
+     * Updates the account balance by deducting the withdrawal amount and saves the updated balance to the database.
+     * If the withdrawal amount exceeds the current balance, an IllegalArgumentException is thrown.
+     *
+     * @param withdrawalRequestDTO The WithdrawalRequestDTO containing the withdrawal details.
+     * @return The BankAccount object with the updated balance.
+     * @throws IllegalArgumentException If the withdrawal amount exceeds the current balance or the bank account is not found.
      */
     private BankAccount updateAccountBalance(WithdrawalRequestDTO withdrawalRequestDTO) {
+        // Initialize a Card object with the card number
+        Card card = new Card();
+        card.setCardNumber(withdrawalRequestDTO.getCardNumber());
+
         // Calculate new balance
-        BankAccount bankAccount = getBankAccount(withdrawalRequestDTO.getCardNumber());
-        if(bankAccount==null){
+        BankAccount bankAccount = bankAccountService.getAccountFromCache(card);
+        if (bankAccount == null) {
             throw new IllegalArgumentException("Bank Account not found"); //TODO: Add more info to exception message
         }
-        BigDecimal updatedBalance = bankAccount.getBalance().subtract(withdrawalRequestDTO.getAmount());
+
+        BigDecimal withdrawalAmount = withdrawalRequestDTO.getAmount();
+        BigDecimal updatedBalance = calculateUpdatedBalance(bankAccount, withdrawalAmount);
 
         // Update account balance
         bankAccount.setBalance(updatedBalance);
         accountRepository.save(bankAccount);
         return bankAccount;
     }
+
+    /**
+     * Calculates the updated balance after deducting the withdrawal amount from the current balance.
+     * If the withdrawal amount exceeds the current balance, an IllegalArgumentException is thrown.
+     *
+     * @param bankAccount     The BankAccount object representing the user's account.
+     * @param withdrawalAmount The amount to be withdrawn from the account.
+     * @return The updated balance after deducting the withdrawal amount.
+     * @throws IllegalArgumentException If the withdrawal amount exceeds the current balance.
+     */
+    private BigDecimal calculateUpdatedBalance(BankAccount bankAccount, BigDecimal withdrawalAmount) {
+        BigDecimal currentBalance = bankAccount.getBalance();
+
+        // Check if withdrawal amount exceeds the current balance
+        if (withdrawalAmount.compareTo(currentBalance) > 0) {
+            throw new IllegalArgumentException("Insufficient balance");
+        }
+
+        return currentBalance.subtract(withdrawalAmount);
+    }
+
 
     /**
      * Cancel a withdrawal request that was not completed.
