@@ -1,7 +1,7 @@
 package com.bankhapoalim.atmwithdrawal.controller;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
-import com.bankhapoalim.atmwithdrawal.service.WithdrawalService;
+import com.bankhapoalim.atmwithdrawal.service.WithdrawalServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/withdrawal")
 public class WithdrawalController {
 
-    private final WithdrawalService withdrawalService;
+    private final WithdrawalServiceImpl withdrawalService;
 
     @Autowired
-    public WithdrawalController(WithdrawalService withdrawalService) {
+    public WithdrawalController(WithdrawalServiceImpl withdrawalService) {
         this.withdrawalService = withdrawalService;
     }
 
