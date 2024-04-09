@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Service
 class BankAccountServiceImplTest {
@@ -54,5 +54,29 @@ class BankAccountServiceImplTest {
         // Call the method with null bankAccount
         assertThrows(IllegalArgumentException.class,
                 () -> bankAccountService.reverseBalance(null, BigDecimal.valueOf(50.0), "Withdrawal cancellation"));
+    }
+
+    @Test
+    void testReverseBalance_Success() {
+        // Create a mock BankAccount object with an initial balance
+        BankAccount bankAccount = new BankAccount();
+        BigDecimal initialBalance = BigDecimal.valueOf(1000.0);
+        bankAccount.setBalance(initialBalance);
+
+        // Set the amount to add back to the balance (simulate reversal)
+        BigDecimal amountToAdd = BigDecimal.valueOf(50.0);
+
+        // Call the reverseBalance method
+        bankAccountService.reverseBalance(bankAccount, amountToAdd, "Withdrawal cancellation");
+
+        // Verify that the updated balance is correct
+        BigDecimal expectedBalance = initialBalance.add(amountToAdd);
+        assertEquals(expectedBalance, bankAccount.getBalance());
+
+        // Verify that the save method was called on the bankAccountRepository
+        verify(bankAccountRepository, times(1)).save(bankAccount);
+
+        // Verify no other interactions with bankAccountRepository
+        verifyNoMoreInteractions(bankAccountRepository);
     }
 }

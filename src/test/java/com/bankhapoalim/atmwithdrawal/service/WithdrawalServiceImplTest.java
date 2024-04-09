@@ -5,6 +5,7 @@ import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.exception.WithdrawalRequestNotFoundException;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
 import com.bankhapoalim.atmwithdrawal.util.ValidationUtils;
@@ -197,6 +198,24 @@ class WithdrawalServiceImplTest {
         // these verifications help ensure that the interactions with the mock object (withdrawalRequestRepository) are as expected
         // and that there are no additional, unintended interactions during the test execution.
         verify(withdrawalRequestRepository, times(1)).findById(123L);
+        verifyNoMoreInteractions(withdrawalRequestRepository);
+    }
+
+    @Test
+    void testCancelWithdrawalRequest_NotFound() {
+        long withdrawalRequestId = 123L;
+
+        // Mock withdrawalRequestRepository.findById to return an empty optional
+        when(withdrawalRequestRepository.findById(withdrawalRequestId)).thenReturn(Optional.empty());
+
+        // Perform the cancellation and expect a WithdrawalRequestNotFoundException
+        assertThrows(WithdrawalRequestNotFoundException.class,
+                () -> withdrawalService.cancelWithdrawalRequest(withdrawalRequestId));
+
+        // Verify that findById was called with the specified ID
+        verify(withdrawalRequestRepository, times(1)).findById(withdrawalRequestId);
+
+        // Verify no other interactions with withdrawalRequestRepository
         verifyNoMoreInteractions(withdrawalRequestRepository);
     }
 }
