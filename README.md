@@ -1,3 +1,7 @@
+**Git Repo**
+
+https://github.com/nirshar1977/atm-withdrawal/tree/dev/src
+
 **Swagger**
 
 Swagger added using open api
@@ -13,9 +17,4 @@ exists under "src/main/resources/db/changelog"
 
 **Application Profiles**
 
-dev profile define for development
-
-**Git Repo**
-
-https://github.com/nirshar1977/atm-withdrawal/tree/dev/src
-
+dev profile for development
