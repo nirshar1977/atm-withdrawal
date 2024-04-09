@@ -37,6 +37,14 @@ databaseChangeLog:
                   constraints:
                     unique: true
                     nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: "bank_account"
             columns:
@@ -57,6 +65,14 @@ databaseChangeLog:
                   type: "decimal(10,2)"
                   constraints:
                     nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: "card"
             columns:
@@ -78,6 +94,14 @@ databaseChangeLog:
                   type: "bigint"
                   constraints:
                     nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: "transaction"
             columns:
@@ -113,6 +137,14 @@ databaseChangeLog:
                   type: enum_trx_status
                   constraints:
                     nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: "transaction_history"
             columns:
@@ -128,6 +160,14 @@ databaseChangeLog:
                   type: "bigint"
                   constraints:
                     nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: "audit_log"
             columns:
@@ -143,6 +183,14 @@ databaseChangeLog:
                   type: "bigint"
                   constraints:
                     nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - addForeignKeyConstraint:
             baseTableName: "bank_account"
             baseColumnNames: "user_id"

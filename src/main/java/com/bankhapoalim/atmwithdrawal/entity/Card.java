@@ -10,7 +10,7 @@ import lombok.Data;
  *  Represents a card associated with a bank account.
  *  It contains a foreign key referencing the BankAccount entity, establishing the relationship.
  */
-public class Card {
+public class Card extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "card_id")

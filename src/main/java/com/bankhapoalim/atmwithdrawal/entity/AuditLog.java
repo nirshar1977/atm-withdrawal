@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * Represents an audit log related to transactions
  */
-public class AuditLog {
+public class AuditLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id")

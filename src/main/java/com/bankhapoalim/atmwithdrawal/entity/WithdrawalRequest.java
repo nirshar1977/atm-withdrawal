@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 /**
  * Represents a transaction related to a bank account
  */
-public class WithdrawalRequest {
+public class WithdrawalRequest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")

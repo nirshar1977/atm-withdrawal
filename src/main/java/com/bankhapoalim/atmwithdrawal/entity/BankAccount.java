@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @Table(name = "bank_account")
 @Data
-public class BankAccount {
+public class BankAccount extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")

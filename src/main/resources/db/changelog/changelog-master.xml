@@ -13,6 +13,8 @@
             <column name="username" type="varchar(255)">
                 <constraints unique="true" nullable="false"/>
             </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
         <!-- Create Bank Account Table -->
@@ -26,6 +28,8 @@
             <column name="balance" type="decimal(10,2)">
                 <constraints nullable="false"/>
             </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
         <!-- Create Card Table -->
@@ -39,6 +43,8 @@
             <column name="account_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
         <!-- Define the trx status enum type -->
@@ -67,6 +73,8 @@
             <column name="status" type="enum_trx_status">
                 <constraints nullable="false"/>
             </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
         <!-- Create Transaction History Table -->
@@ -77,6 +85,8 @@
             <column name="transaction_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
         <!-- Create Audit Log Table -->
@@ -87,6 +97,8 @@
             <column name="transaction_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
         <!-- Add Foreign Keys -->

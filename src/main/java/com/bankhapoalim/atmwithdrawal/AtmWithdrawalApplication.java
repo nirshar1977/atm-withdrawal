@@ -5,8 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
+@EnableJpaAuditing
 @Profile("dev")
 @EntityScan("com.bankhapoalim.atmwithdrawal.entity")
 @ComponentScan(basePackages = {"com.bankhapoalim.atmwithdrawal.config"})

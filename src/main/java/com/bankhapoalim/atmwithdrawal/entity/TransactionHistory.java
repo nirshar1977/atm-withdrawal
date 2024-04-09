@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * Represents the history of transactions.
  */
-public class TransactionHistory {
+public class TransactionHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "history_id")
