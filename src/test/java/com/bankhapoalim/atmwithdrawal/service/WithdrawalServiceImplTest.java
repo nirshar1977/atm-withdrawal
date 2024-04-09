@@ -7,6 +7,7 @@ import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
 import com.bankhapoalim.atmwithdrawal.util.ValidationUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 class WithdrawalServiceImplTest {
 
     @Mock
@@ -141,8 +143,22 @@ class WithdrawalServiceImplTest {
         // Mock the findById methods of withdrawalRequestRepository and bankAccountRepository
         when(withdrawalRequestRepository.findById(anyLong())).thenReturn(Optional.of(withdrawalRequest));
 
-        // Mock the reverseBalance method of bankAccountService
-        //doNothing().when(bankAccountService).reverseBalance(eq(accountId), any(BigDecimal.class), eq("Withdrawal cancellation"));
+        // Mock the reverseBalance method of bankAccountService to simulate balance deduction
+        doAnswer(invocation -> {
+            BankAccount bankAccountArg = invocation.getArgument(0);
+            BigDecimal amountToAddArg = invocation.getArgument(1);
+            String reasonArg = invocation.getArgument(2);
+
+            // Simulate balance deduction
+            BigDecimal updatedBalance = bankAccountArg.getBalance().add(amountToAddArg);
+            bankAccountArg.setBalance(updatedBalance);
+
+            // Log the balance reversal
+            log.info("Balance reversed for account ID {} by subtracting {} due to: {}",
+                    bankAccountArg.getAccountId(), amountToAddArg, reasonArg);
+
+            return null; // Since reverseBalance returns void
+        }).when(bankAccountService).reverseBalance(eq(bankAccount), eq(withdrawalAmount), eq("Withdrawal cancellation"));
 
         // Perform the cancellation
         boolean cancellationResult = withdrawalService.cancelWithdrawalRequest(123L);
@@ -160,6 +176,6 @@ class WithdrawalServiceImplTest {
         // Verify interactions with the repositories/services
         verify(withdrawalRequestRepository, times(1)).findById(123L);
         verify(withdrawalRequestRepository, times(1)).save(withdrawalRequest);
-        verify(accountRepository, times(1)).findById(accountId);
+        verify(bankAccountService, times(1)).reverseBalance(eq(bankAccount), eq(withdrawalAmount), eq("Withdrawal cancellation"));
     }
 }
