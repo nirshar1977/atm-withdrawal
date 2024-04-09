@@ -2,7 +2,6 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.Card;
-import com.bankhapoalim.atmwithdrawal.exception.AccountNotFoundException;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

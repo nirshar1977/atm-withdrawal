@@ -2,6 +2,7 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
+import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
@@ -13,9 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,9 +39,9 @@ class WithdrawalServiceImplTest {
     private WithdrawalRequestRepository withdrawalRequestRepository;
 
     @Mock
-    private BankAccountRepository accountRepository;
+    private BankAccountRepository bankAccountRepository;
 
-    @Mock
+    @InjectMocks
     private BankAccountServiceImpl bankAccountService;
 
     @InjectMocks
@@ -66,7 +74,7 @@ class WithdrawalServiceImplTest {
 
         // Verify that the save method was called with the correct parameters
         verify(withdrawalRequestRepository, times(1)).save(any());
-        verify(accountRepository, times(1)).save(any());
+        verify(bankAccountRepository, times(1)).save(any());
 
         // Assert the result
         assert(result);
@@ -87,7 +95,7 @@ class WithdrawalServiceImplTest {
 
         // Verify that the save method was not called (since the request is invalid)
         verify(withdrawalRequestRepository, never()).save(any());
-        verify(accountRepository, never()).save(any());
+        verify(bankAccountRepository, never()).save(any());
 
         // Assert that the method returned false
         assert(!result);
@@ -109,8 +117,8 @@ class WithdrawalServiceImplTest {
 
         // Mock the bankAccountService to return the mockBankAccount
         when(bankAccountService.getAccountFromCache(any())).thenReturn(bankAccount);
-        when(accountRepository.save(any(BankAccount.class))).thenReturn(bankAccount);
-        when(accountRepository.findById(anyLong())).thenReturn(java.util.Optional.of(bankAccount));
+        when(bankAccountRepository.save(any(BankAccount.class))).thenReturn(bankAccount);
+        when(bankAccountRepository.findById(anyLong())).thenReturn(java.util.Optional.of(bankAccount));
 
 
         // Set an amount greater than the current balance
@@ -121,7 +129,7 @@ class WithdrawalServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> withdrawalService.processWithdrawalRequest(withdrawalRequestDTO));
 
         // Verify that the account balance was not updated (since the balance is insufficient)
-        verify(accountRepository, never()).save(any());
+        verify(bankAccountRepository, never()).save(any());
     }
 
     @Test
@@ -177,5 +185,33 @@ class WithdrawalServiceImplTest {
         verify(withdrawalRequestRepository, times(1)).findById(123L);
         verify(withdrawalRequestRepository, times(1)).save(withdrawalRequest);
         verify(bankAccountService, times(1)).reverseBalance(eq(bankAccount), eq(withdrawalAmount), eq("Withdrawal cancellation"));
+    }
+
+    @Test
+    void testReverseBalance_NonNullBankAccount() {
+        // Mock data
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setAccountId(123L);
+        bankAccount.setBalance(BigDecimal.valueOf(1000.0));
+
+        BigDecimal amountToAdd = BigDecimal.valueOf(50.0);
+        String reason = "Withdrawal cancellation";
+
+        // Mock bankAccountRepository.save() to return the same bankAccount object
+        when(bankAccountRepository.save(any(BankAccount.class))).thenReturn(bankAccount);
+
+        // Call the method
+        bankAccountService.reverseBalance(bankAccount, amountToAdd, reason);
+
+        // Verify that balance is updated correctly
+        BigDecimal expectedBalance = BigDecimal.valueOf(1050.0);
+        assertEquals(expectedBalance, bankAccount.getBalance());
+    }
+
+    @Test
+    void testReverseBalance_NullBankAccount() {
+        // Call the method with null bankAccount
+        assertThrows(IllegalArgumentException.class,
+                () -> bankAccountService.reverseBalance(null, BigDecimal.valueOf(50.0), "Withdrawal cancellation"));
     }
 }
