@@ -2,7 +2,6 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
-import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
@@ -14,16 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
