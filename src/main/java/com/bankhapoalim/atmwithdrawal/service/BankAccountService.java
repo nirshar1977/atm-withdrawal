@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 
 public interface BankAccountService {
     BankAccount getAccountFromCache(Card card);
-    void reverseBalance(Long accountId, BigDecimal amountToAdd, String reason);
+    void reverseBalance(BankAccount bankAccount, BigDecimal amountToAdd, String reason);
 }

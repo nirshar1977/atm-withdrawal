@@ -142,7 +142,7 @@ class WithdrawalServiceImplTest {
         when(withdrawalRequestRepository.findById(anyLong())).thenReturn(Optional.of(withdrawalRequest));
 
         // Mock the reverseBalance method of bankAccountService
-        doNothing().when(bankAccountService).reverseBalance(eq(accountId), any(BigDecimal.class), eq("Withdrawal cancellation"));
+        //doNothing().when(bankAccountService).reverseBalance(eq(accountId), any(BigDecimal.class), eq("Withdrawal cancellation"));
 
         // Perform the cancellation
         boolean cancellationResult = withdrawalService.cancelWithdrawalRequest(123L);

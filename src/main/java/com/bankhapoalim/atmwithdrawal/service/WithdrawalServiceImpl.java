@@ -138,7 +138,7 @@ public class WithdrawalServiceImpl implements WithdrawalService{
             switch(withdrawalRequest.getStatus()){
                 case COMPLETED -> {
                     BigDecimal amountToReverse = withdrawalRequest.getAmount();
-                    bankAccountService.reverseBalance(withdrawalRequest.getBankAccount().getAccountId(), amountToReverse, "Withdrawal cancellation");
+                    bankAccountService.reverseBalance(withdrawalRequest.getBankAccount(), amountToReverse, "Withdrawal cancellation");
                     withdrawalRequest.setStatus(WithdrawalStatus.CANCELED);
                     withdrawalRequestRepository.save(withdrawalRequest);
                     res = true;

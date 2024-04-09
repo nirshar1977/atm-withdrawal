@@ -63,23 +63,22 @@ public class BankAccountServiceImpl implements  BankAccountService {
     /**
      * Reverses a balance deduction by adding a specified amount to the account balance.
      *
-     * @param accountId  The unique identifier of the account.
+     * @param bankAccount The account to be balanced.
      * @param amountToAdd The amount to add back to the account balance.
      * @param reason      The reason or description for the balance reversal.
-     * @throws AccountNotFoundException if the account with the given ID is not found.
+     * @throws IllegalArgumentException if the Bank account is null.
      */
     @Override
-    public void reverseBalance(Long accountId, BigDecimal amountToAdd, String reason) {
-        Optional<BankAccount>  bankAccountOptional = bankAccountRepository.findById(accountId);
-        if ( bankAccountOptional.isPresent()) {
-            BankAccount bankAccount =  bankAccountOptional.get();
+    public void reverseBalance(BankAccount bankAccount, BigDecimal amountToAdd, String reason) {
+        if ( bankAccount!=null) {
             BigDecimal currentBalance =  bankAccount.getBalance();
             BigDecimal updatedBalance = currentBalance.add(amountToAdd);
             bankAccount.setBalance(updatedBalance);
             bankAccountRepository.save(bankAccount);
-            log.info("Balance reversed for account ID {} by adding {} due to: {}", accountId, amountToAdd, reason);
+            log.info("Balance reversed for account ID {} by adding {} due to: {}", bankAccount.getAccountId(), amountToAdd, reason);
         } else {
-            throw new AccountNotFoundException("Account with ID " + accountId + " not found.");
+            log.warn("Null bank account encountered in reverseBalance method");
+            throw new IllegalArgumentException("Bank account is null");
         }
     }
 }
