@@ -47,9 +47,8 @@
             <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
         </createTable>
 
-        <!-- Define the trx status enum type -->
         <sql>
-            CREATE TYPE enum_trx_status AS ENUM ('PENDING', 'COMPLETED', 'CANCELLED');
+            CREATE TYPE withdrawalstatus AS ENUM ('PENDING', 'COMPLETED', 'CANCELLED', 'IN_PROGRESS');
         </sql>
 
 
@@ -70,7 +69,7 @@
             <column name="amount" type="decimal(10, 2)">
                 <constraints nullable="false"/>
             </column>
-            <column name="status" type="enum_trx_status">
+            <column name="status" type="WithdrawalStatus">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />

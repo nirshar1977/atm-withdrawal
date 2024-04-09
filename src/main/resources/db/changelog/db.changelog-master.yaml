@@ -18,9 +18,8 @@ databaseChangeLog:
           tableExists:
             tableName: audit_log
       changes:
-        - # Define the trx status enum type
-          - sql:
-              sql: CREATE TYPE enum_trx_status AS ENUM ('PENDING', 'COMPLETED', 'CANCELLED')
+        - sql:
+              sql: CREATE TYPE withdrawal_status AS ENUM ('PENDING', 'COMPLETED', 'CANCELLED', 'IN_PROGRESS');
         - createTable:
             tableName: "user"
             columns:
@@ -134,7 +133,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: status
-                  type: enum_trx_status
+                  type: withdrawal_status
                   constraints:
                     nullable: false
               - column:

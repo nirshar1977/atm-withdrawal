@@ -2,7 +2,9 @@ package com.bankhapoalim.atmwithdrawal;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 
+@Profile("test")
 @SpringBootTest(classes = AtmWithdrawalApplication.class)
 class AtmWithdrawalApplicationTests {
 

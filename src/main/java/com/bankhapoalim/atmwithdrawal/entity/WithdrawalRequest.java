@@ -2,7 +2,7 @@ package com.bankhapoalim.atmwithdrawal.entity;
 
 
 
-import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.enums.WithdrawalRequestStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -34,7 +34,7 @@ public class WithdrawalRequest extends BaseEntity {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private WithdrawalStatus status;
+    @Column(name = "status", columnDefinition = "withdrawal_status")
+    private WithdrawalRequestStatus status;
 }
 

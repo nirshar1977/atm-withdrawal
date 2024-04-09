@@ -2,9 +2,8 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
-import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
-import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.enums.WithdrawalRequestStatus;
 import com.bankhapoalim.atmwithdrawal.exception.WithdrawalRequestNotFoundException;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
 import com.bankhapoalim.atmwithdrawal.repository.WithdrawalRequestRepository;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -130,7 +128,7 @@ class WithdrawalServiceImplTest {
     void testCancelWithdrawalRequest_Completed() {
         // Mock a completed withdrawal request
         WithdrawalRequest withdrawalRequest = new WithdrawalRequest();
-        withdrawalRequest.setStatus(WithdrawalStatus.COMPLETED);
+        withdrawalRequest.setStatus(WithdrawalRequestStatus.COMPLETED);
         BigDecimal withdrawalAmount = BigDecimal.valueOf(50.0);
         withdrawalRequest.setAmount(withdrawalAmount);
 
@@ -169,7 +167,7 @@ class WithdrawalServiceImplTest {
         assertTrue(cancellationResult); // Assuming your cancelWithdrawalRequest method returns a boolean indicating success
 
         // Verify that the withdrawal status is updated to CANCELED
-        assertEquals(WithdrawalStatus.CANCELED, withdrawalRequest.getStatus());
+        assertEquals(WithdrawalRequestStatus.CANCELED, withdrawalRequest.getStatus());
 
         // Verify that the amount is added back to the account balance
         BigDecimal expectedBalance = initialBalance.add(withdrawalAmount);
@@ -185,7 +183,7 @@ class WithdrawalServiceImplTest {
     void testCancelWithdrawalRequest_InProgress() {
         // Mock a withdrawal request in progress
         WithdrawalRequest withdrawalRequest = new WithdrawalRequest();
-        withdrawalRequest.setStatus(WithdrawalStatus.IN_PROGRESS);
+        withdrawalRequest.setStatus(WithdrawalRequestStatus.IN_PROGRESS);
         BigDecimal withdrawalAmount = BigDecimal.valueOf(50.0);
         withdrawalRequest.setAmount(withdrawalAmount);
 

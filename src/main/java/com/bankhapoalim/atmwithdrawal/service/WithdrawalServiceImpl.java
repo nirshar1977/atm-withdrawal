@@ -4,7 +4,7 @@ import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
 import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
-import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
+import com.bankhapoalim.atmwithdrawal.enums.WithdrawalRequestStatus;
 import com.bankhapoalim.atmwithdrawal.exception.AccountNotFoundException;
 import com.bankhapoalim.atmwithdrawal.exception.WithdrawalProcessingException;
 import com.bankhapoalim.atmwithdrawal.exception.WithdrawalRequestNotFoundException;
@@ -54,12 +54,12 @@ public class WithdrawalServiceImpl implements WithdrawalService{
                 .setSecretCode(withdrawalRequestDTO.getSecretCode())
                 .setAmount(withdrawalRequestDTO.getAmount())
                 .setBankAccount(bankAccount)
-                .setWithdrawalStatus(WithdrawalStatus.IN_PROGRESS)
+                .setWithdrawalStatus(WithdrawalRequestStatus.IN_PROGRESS)
                 .build();
 
         try {
             withdrawalRequestRepository.save(withdrawalRequest);
-            withdrawalRequest.setStatus(WithdrawalStatus.COMPLETED);
+            withdrawalRequest.setStatus(WithdrawalRequestStatus.COMPLETED);
             log.info("Withdrawal request processed successfully: {}", withdrawalRequest);
         } catch (Exception e) {
             log.error("Failed to process withdrawal request: {}", e.getMessage());
@@ -138,7 +138,7 @@ public class WithdrawalServiceImpl implements WithdrawalService{
                 case COMPLETED -> {
                     BigDecimal amountToReverse = withdrawalRequest.getAmount();
                     bankAccountService.reverseBalance(withdrawalRequest.getBankAccount(), amountToReverse, "Withdrawal cancellation");
-                    withdrawalRequest.setStatus(WithdrawalStatus.CANCELED);
+                    withdrawalRequest.setStatus(WithdrawalRequestStatus.CANCELED);
                     withdrawalRequestRepository.save(withdrawalRequest);
                     res = true;
                 }
