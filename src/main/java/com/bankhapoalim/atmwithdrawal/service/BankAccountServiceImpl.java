@@ -38,7 +38,10 @@ public class BankAccountServiceImpl implements  BankAccountService {
      */
     @Override
     @Cacheable(value = "bankAccountCache", key = "#card.cardNumber")
-    public BankAccount getAccountFromCache(Card card) {
+    public BankAccount getAccountFromCacheByCardNumber(Card card) {
+        if (card == null) {
+            throw new IllegalArgumentException("Card cannot be null");
+        }
         String cardNumber = card.getCardNumber();
         log.info("Checking cache for bank account with card number: {}", cardNumber);
         Optional<BankAccount> cachedAccount = Optional.ofNullable(redisTemplate.opsForValue().get(cardNumber));

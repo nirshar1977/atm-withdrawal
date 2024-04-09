@@ -49,7 +49,6 @@ public class WithdrawalServiceImpl implements WithdrawalService{
 
         BankAccount bankAccount = updateAccountBalance(withdrawalRequestDTO);
 
-
         WithdrawalRequest withdrawalRequest = new WithdrawalRequestBuilder()
                 .setCardNumber(withdrawalRequestDTO.getCardNumber())
                 .setSecretCode(withdrawalRequestDTO.getSecretCode())
@@ -84,7 +83,7 @@ public class WithdrawalServiceImpl implements WithdrawalService{
         card.setCardNumber(withdrawalRequestDTO.getCardNumber());
 
         // Calculate new balance
-        BankAccount bankAccount = bankAccountService.getAccountFromCache(card);
+        BankAccount bankAccount = bankAccountService.getAccountFromCacheByCardNumber(card);
         if (bankAccount == null) {
             throw new AccountNotFoundException("Bank Account not found for card: " + card.getCardNumber());
         }
@@ -177,6 +176,6 @@ public class WithdrawalServiceImpl implements WithdrawalService{
         card.setCardNumber(cardNumber);
 
         // Use getAccountFromCache to retrieve the BankAccount associated with the card
-        return bankAccountService.getAccountFromCache(card);
+        return bankAccountService.getAccountFromCacheByCardNumber(card);
     }
 }

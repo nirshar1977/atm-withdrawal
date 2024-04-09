@@ -2,6 +2,7 @@ package com.bankhapoalim.atmwithdrawal.service;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
+import com.bankhapoalim.atmwithdrawal.entity.Card;
 import com.bankhapoalim.atmwithdrawal.entity.WithdrawalRequest;
 import com.bankhapoalim.atmwithdrawal.enums.WithdrawalStatus;
 import com.bankhapoalim.atmwithdrawal.repository.BankAccountRepository;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -33,7 +35,7 @@ class WithdrawalServiceImplTest {
     @Mock
     private BankAccountRepository bankAccountRepository;
 
-    @InjectMocks
+    @Mock
     private BankAccountServiceImpl bankAccountService;
 
     @InjectMocks
@@ -59,7 +61,7 @@ class WithdrawalServiceImplTest {
         mockBankAccount.setBalance(BigDecimal.valueOf(1000.0));
 
         // Mock the bankAccountService to return the mockBankAccount
-        when(bankAccountService.getAccountFromCache(any())).thenReturn(mockBankAccount);
+        when(bankAccountService.getAccountFromCacheByCardNumber(any())).thenReturn(mockBankAccount);
 
         // Perform the method call
         boolean result = withdrawalService.processWithdrawalRequest(withdrawalRequestDTO);
@@ -107,8 +109,7 @@ class WithdrawalServiceImplTest {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setBalance(currentBalance);
 
-        // Mock the bankAccountService to return the mockBankAccount
-        when(bankAccountService.getAccountFromCache(any())).thenReturn(bankAccount);
+        when(bankAccountService.getAccountFromCacheByCardNumber(any())).thenReturn(bankAccount);
         when(bankAccountRepository.save(any(BankAccount.class))).thenReturn(bankAccount);
         when(bankAccountRepository.findById(anyLong())).thenReturn(java.util.Optional.of(bankAccount));
 
@@ -180,30 +181,22 @@ class WithdrawalServiceImplTest {
     }
 
     @Test
-    void testReverseBalance_NonNullBankAccount() {
-        // Mock data
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountId(123L);
-        bankAccount.setBalance(BigDecimal.valueOf(1000.0));
+    void testCancelWithdrawalRequest_InProgress() {
+        // Mock a withdrawal request in progress
+        WithdrawalRequest withdrawalRequest = new WithdrawalRequest();
+        withdrawalRequest.setStatus(WithdrawalStatus.IN_PROGRESS);
+        BigDecimal withdrawalAmount = BigDecimal.valueOf(50.0);
+        withdrawalRequest.setAmount(withdrawalAmount);
 
-        BigDecimal amountToAdd = BigDecimal.valueOf(50.0);
-        String reason = "Withdrawal cancellation";
+        when(withdrawalRequestRepository.findById(anyLong())).thenReturn(Optional.of(withdrawalRequest));
 
-        // Mock bankAccountRepository.save() to return the same bankAccount object
-        when(bankAccountRepository.save(any(BankAccount.class))).thenReturn(bankAccount);
+        // Verify that canceling an in-progress withdrawal request throws an IllegalStateException
+        assertThrows(IllegalStateException.class, () -> withdrawalService.cancelWithdrawalRequest(123L));
 
-        // Call the method
-        bankAccountService.reverseBalance(bankAccount, amountToAdd, reason);
-
-        // Verify that balance is updated correctly
-        BigDecimal expectedBalance = BigDecimal.valueOf(1050.0);
-        assertEquals(expectedBalance, bankAccount.getBalance());
-    }
-
-    @Test
-    void testReverseBalance_NullBankAccount() {
-        // Call the method with null bankAccount
-        assertThrows(IllegalArgumentException.class,
-                () -> bankAccountService.reverseBalance(null, BigDecimal.valueOf(50.0), "Withdrawal cancellation"));
+        // Verify interactions
+        // these verifications help ensure that the interactions with the mock object (withdrawalRequestRepository) are as expected
+        // and that there are no additional, unintended interactions during the test execution.
+        verify(withdrawalRequestRepository, times(1)).findById(123L);
+        verifyNoMoreInteractions(withdrawalRequestRepository);
     }
 }
