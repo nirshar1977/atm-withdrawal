@@ -2,6 +2,7 @@ package com.bankhapoalim.atmwithdrawal.util;
 
 import com.bankhapoalim.atmwithdrawal.dto.WithdrawalRequestDTO;
 import com.bankhapoalim.atmwithdrawal.entity.BankAccount;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -22,10 +23,11 @@ import java.util.function.Predicate;
  */
 @Component
 @Slf4j
+@Data
 public class ValidationUtils {
 
     // Read the threshold value from application properties
-    @Value("${duplicate.threshold.minutes}")
+    @Value("${duplicate.threshold.minutes:1}")
     //This variable holds the value of duplicate.threshold.minutes,
     // which represents the time threshold for duplicate requests in minutes.
     private int duplicateThresholdMinutes;
@@ -107,6 +109,12 @@ public class ValidationUtils {
             double dailyWithdrawalAmount = dailyWithdrawalAmounts.getOrDefault(cardNumber, 0.0);
             AtomicInteger dailyWithdrawalCount = dailyWithdrawalCounts.computeIfAbsent(cardNumber, k -> new AtomicInteger());
 
+            // Check if the total daily withdrawal amount plus the new withdrawal amount exceeds the daily limit
+            if (dailyWithdrawalAmount + amount > MAX_DAILY_WITHDRAWAL_AMOUNT) {
+                log.error("Exceeded daily withdrawal limit for customer: {}", cardNumber);
+                return false;
+            }
+
             //If this condition is true, it indicates that the withdrawal request is happening on a new day,
             // and the daily withdrawal limits need to be reset for the customer.
             if (lastWithdrawalTime == null || lastWithdrawalTime.toLocalDate().isBefore(currentTime.toLocalDate())) {
@@ -117,9 +125,6 @@ public class ValidationUtils {
                     && dailyWithdrawalCount.incrementAndGet() <= MAX_DAILY_WITHDRAWALS) {
                 dailyWithdrawalAmounts.put(cardNumber, dailyWithdrawalAmount + amount);
                 lastWithdrawalTimes.put(cardNumber, currentTime);
-            } else {
-                log.error("Exceeded daily withdrawal limit or count for customer: {}", cardNumber);
-                return false;
             }
 
             return true;
